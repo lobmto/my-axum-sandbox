@@ -1,6 +1,10 @@
+use std::sync::Arc;
+
 use axum::async_trait;
 
 use crate::users;
+
+pub type DynService = Arc<dyn Service + Send + Sync>;
 
 #[async_trait]
 pub trait Service {

@@ -1,6 +1,6 @@
-use super::service::{Service, ServiceImpl};
 use crate::users;
 use axum::{
+    extract::State,
     http::StatusCode,
     response::{IntoResponse, Response},
     Json,
@@ -8,9 +8,10 @@ use axum::{
 use serde::Deserialize;
 
 pub async fn create_user(
+    State(service): State<users::service::DynService>,
     Json(request): Json<CreateRequest>,
 ) -> Result<(StatusCode, Json<users::Entity>), users::service::Error> {
-    let user = ServiceImpl {}.create_user(request.into()).await?;
+    let user = service.create_user(request.into()).await?;
 
     Ok((StatusCode::CREATED, Json(user)))
 }
