@@ -1,4 +1,3 @@
-use crate::users;
 use axum::{
     extract::State,
     http::StatusCode,
@@ -6,6 +5,8 @@ use axum::{
     Json,
 };
 use serde::Deserialize;
+
+use crate::users;
 
 pub async fn create_user(
     State(service): State<users::service::DynService>,

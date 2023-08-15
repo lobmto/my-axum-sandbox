@@ -1,7 +1,8 @@
 mod users;
 
-use axum::{routing::get, Router};
 use std::net::SocketAddr;
+
+use axum::{routing::get, Router};
 
 #[tokio::main]
 async fn main() {
