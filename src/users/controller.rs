@@ -1,30 +1,39 @@
-use axum::{http::StatusCode, routing::post, Json, Router};
-use serde::{Deserialize, Serialize};
+use crate::users;
+use axum::{
+    extract::State,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
+use serde::Deserialize;
 
-pub fn user_routes() -> Router {
-    Router::new().route("/", post(create_user))
-}
+pub async fn create_user(
+    State(service): State<users::service::DynService>,
+    Json(request): Json<CreateRequest>,
+) -> Result<(StatusCode, Json<users::Entity>), users::service::Error> {
+    let user = service.create_user(request.into()).await?;
 
-async fn create_user(Json(payload): Json<CreateUser>) -> (StatusCode, Json<User>) {
-    // insert your application logic here
-    let user = User {
-        id: 1337,
-        username: payload.username,
-    };
-
-    // this will be converted into a JSON response
-    // with a status code of `201 Created`
-    (StatusCode::CREATED, Json(user))
+    Ok((StatusCode::CREATED, Json(user)))
 }
 
 #[derive(Deserialize)]
-pub struct CreateUser {
-    username: String,
+pub struct CreateRequest {
+    pub username: String,
+}
+impl From<CreateRequest> for users::service::CreateRequest {
+    fn from(value: CreateRequest) -> Self {
+        users::service::CreateRequest {
+            username: value.username,
+        }
+    }
 }
 
-// the output to our `create_user` handler
-#[derive(Serialize)]
-pub struct User {
-    id: u64,
-    username: String,
+impl IntoResponse for users::service::Error {
+    fn into_response(self) -> Response {
+        match self {
+            users::service::Error::UnknownError(_) => {
+                (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()).into_response()
+            }
+        }
+    }
 }
