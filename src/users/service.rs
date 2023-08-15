@@ -8,14 +8,14 @@ pub type DynService = Arc<dyn Service + Send + Sync>;
 
 #[async_trait]
 pub trait Service {
-    async fn create_user(&self, payload: CreateRequest) -> Result<users::Entity, service::Error>;
+    async fn create_user(&self, payload: CreateRequest) -> Result<users::Entity, local::Error>;
 }
 
 pub struct ServiceImpl {}
 
 #[async_trait]
 impl Service for ServiceImpl {
-    async fn create_user(&self, payload: CreateRequest) -> Result<users::Entity, service::Error> {
+    async fn create_user(&self, payload: CreateRequest) -> Result<users::Entity, local::Error> {
         Ok(users::Entity {
             id: 1234,
             username: payload.username,
@@ -26,10 +26,11 @@ pub struct CreateRequest {
     pub username: String,
 }
 
-pub use service::Error;
-mod service {
+pub use local::Error;
+mod local {
     #[derive(Debug, thiserror::Error)]
     pub enum Error {
+        #[allow(dead_code)]
         #[error("Unknown error: {0}")]
         UnknownError(String),
     }
