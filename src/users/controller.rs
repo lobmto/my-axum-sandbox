@@ -1,8 +1,8 @@
 use super::{
-    dto::{CreateUser, User},
-    service,
+    dto::CreateUser,
     service::{Service, ServiceImpl},
 };
+use crate::{users, users::service};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -11,7 +11,7 @@ use axum::{
 
 pub async fn create_user(
     Json(payload): Json<CreateUser>,
-) -> Result<(StatusCode, Json<User>), service::Error> {
+) -> Result<(StatusCode, Json<users::Entity>), service::Error> {
     let user = ServiceImpl {}.create_user(payload).await?;
 
     Ok((StatusCode::CREATED, Json(user)))
