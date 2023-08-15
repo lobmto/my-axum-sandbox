@@ -1,5 +1,5 @@
 use super::service::{Service, ServiceImpl};
-use crate::{users, users::service};
+use crate::users;
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
@@ -9,7 +9,7 @@ use serde::Deserialize;
 
 pub async fn create_user(
     Json(request): Json<CreateRequest>,
-) -> Result<(StatusCode, Json<users::Entity>), service::Error> {
+) -> Result<(StatusCode, Json<users::Entity>), users::service::Error> {
     let user = ServiceImpl {}.create_user(request.into()).await?;
 
     Ok((StatusCode::CREATED, Json(user)))
@@ -19,18 +19,18 @@ pub async fn create_user(
 pub struct CreateRequest {
     pub username: String,
 }
-impl From<CreateRequest> for service::CreateRequest {
+impl From<CreateRequest> for users::service::CreateRequest {
     fn from(value: CreateRequest) -> Self {
-        service::CreateRequest {
+        users::service::CreateRequest {
             username: value.username,
         }
     }
 }
 
-impl IntoResponse for service::Error {
+impl IntoResponse for users::service::Error {
     fn into_response(self) -> Response {
         match self {
-            service::Error::UnknownError(_) => {
+            users::service::Error::UnknownError(_) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, self.to_string()).into_response()
             }
         }
