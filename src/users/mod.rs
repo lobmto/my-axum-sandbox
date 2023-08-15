@@ -2,7 +2,6 @@ use axum::{routing::post, Router};
 use serde::Serialize;
 
 pub mod controller;
-pub mod dto;
 pub mod service;
 
 pub fn routes() -> Router {

@@ -1,20 +1,30 @@
-use super::{
-    dto::CreateUser,
-    service::{Service, ServiceImpl},
-};
+use super::service::{Service, ServiceImpl};
 use crate::{users, users::service};
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };
+use serde::Deserialize;
 
 pub async fn create_user(
-    Json(payload): Json<CreateUser>,
+    Json(request): Json<CreateRequest>,
 ) -> Result<(StatusCode, Json<users::Entity>), service::Error> {
-    let user = ServiceImpl {}.create_user(payload).await?;
+    let user = ServiceImpl {}.create_user(request.into()).await?;
 
     Ok((StatusCode::CREATED, Json(user)))
+}
+
+#[derive(Deserialize)]
+pub struct CreateRequest {
+    pub username: String,
+}
+impl From<CreateRequest> for service::CreateRequest {
+    fn from(value: CreateRequest) -> Self {
+        service::CreateRequest {
+            username: value.username,
+        }
+    }
 }
 
 impl IntoResponse for service::Error {
