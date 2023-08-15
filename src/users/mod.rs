@@ -1,17 +1,14 @@
-use std::sync::Arc;
-
-use axum::{routing::post, Router};
 use serde::Serialize;
+use shaku::module;
 
 pub mod controller;
 pub mod service;
 
-pub fn routes() -> Router {
-    let user_service = Arc::new(service::ServiceImpl {}) as service::DynService;
-
-    Router::new()
-        .route("/", post(controller::create_user))
-        .with_state(user_service)
+module! {
+    pub AppModule {
+        components = [service::ServiceImpl],
+        providers = []
+    }
 }
 
 #[derive(Serialize)]

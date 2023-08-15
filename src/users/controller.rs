@@ -1,15 +1,15 @@
 use axum::{
-    extract::State,
     http::StatusCode,
     response::{IntoResponse, Response},
     Json,
 };
 use serde::Deserialize;
+use shaku_axum::Inject;
 
-use crate::users;
+use crate::users::{self, AppModule};
 
 pub async fn create_user(
-    State(service): State<users::service::DynService>,
+    service: Inject<AppModule, dyn users::service::Service>,
     Json(request): Json<CreateRequest>,
 ) -> Result<(StatusCode, Json<users::Entity>), users::service::Error> {
     let user = service.create_user(request.into()).await?;
