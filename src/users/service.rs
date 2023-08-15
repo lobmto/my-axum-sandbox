@@ -1,16 +1,15 @@
-use std::sync::Arc;
-
 use axum::async_trait;
+use shaku::{Component, Interface};
 
 use crate::users;
 
-pub type DynService = Arc<dyn Service + Send + Sync>;
-
 #[async_trait]
-pub trait Service {
+pub trait Service: Interface {
     async fn create_user(&self, payload: CreateRequest) -> Result<users::Entity, local::Error>;
 }
 
+#[derive(Component)]
+#[shaku(interface = Service)]
 pub struct ServiceImpl {}
 
 #[async_trait]
