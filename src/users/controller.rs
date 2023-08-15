@@ -1,11 +1,7 @@
-use axum::{http::StatusCode, routing::post, Json, Router};
+use axum::{http::StatusCode, Json};
 use serde::{Deserialize, Serialize};
 
-pub fn user_routes() -> Router {
-    Router::new().route("/", post(create_user))
-}
-
-async fn create_user(Json(payload): Json<CreateUser>) -> (StatusCode, Json<User>) {
+pub async fn create_user(Json(payload): Json<CreateUser>) -> (StatusCode, Json<User>) {
     // insert your application logic here
     let user = User {
         id: 1337,

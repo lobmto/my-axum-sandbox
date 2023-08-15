@@ -3,8 +3,6 @@ mod users;
 use axum::{routing::get, Router};
 use std::net::SocketAddr;
 
-use crate::users::controller::user_routes;
-
 #[tokio::main]
 async fn main() {
     // initialize tracing
@@ -12,7 +10,7 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .nest("/users", user_routes())
+        .nest("/users", users::routes())
         // `GET /` goes to `root`
         .route("/", get(root));
 
