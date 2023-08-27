@@ -7,13 +7,16 @@ use axum::{
     routing::{get, post},
     Router,
 };
+use tracing_subscriber::{filter::LevelFilter, fmt};
 
 use crate::users::AppModule;
 
 #[tokio::main]
 async fn main() {
     // initialize tracing
-    tracing_subscriber::fmt::init();
+    fmt::Subscriber::builder()
+        .with_max_level(LevelFilter::DEBUG)
+        .init();
 
     let module = Arc::new(AppModule::builder().build());
 
