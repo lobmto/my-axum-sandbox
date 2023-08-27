@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use axum::async_trait;
 use shaku::{Component, Interface};
 
@@ -10,15 +12,18 @@ pub trait Service: Interface {
 
 #[derive(Component)]
 #[shaku(interface = Service)]
-pub struct ServiceImpl {}
+pub struct ServiceImpl {
+    #[shaku(inject)]
+    repository: Arc<dyn users::repository::Repository>,
+}
 
 #[async_trait]
 impl Service for ServiceImpl {
     async fn create_user(&self, payload: CreateRequest) -> Result<users::Entity, local::Error> {
-        Ok(users::Entity {
-            id: 1234,
-            username: payload.username,
-        })
+        self.repository
+            .create_user(payload.username)
+            .await
+            .map_err(Into::into)
     }
 }
 pub struct CreateRequest {
@@ -32,5 +37,13 @@ mod local {
         #[allow(dead_code)]
         #[error("Unknown error: {0}")]
         UnknownError(String),
+    }
+}
+
+impl From<users::repository::Error> for local::Error {
+    fn from(value: users::repository::Error) -> local::Error {
+        match value {
+            users::repository::Error::UnknownError(_) => local::Error::UnknownError("".to_string()),
+        }
     }
 }
